@@ -16,16 +16,40 @@ namespace AP16
             var recordsToDeleteFileLocation = "EmployeesToDelete.txt";
             var outputFileLocation = "Results.txt";
 
+            // We'll give the user some feedback so they know what's going on.
+            Console.WriteLine($"Looking for input files {sourceFileLocation} and {recordsToDeleteFileLocation}");
+
+            IEnumerable<Employee> employees = null;
+            IEnumerable<string> idsToDelete = null;
+
             // Load data from our two files
-            var employees = LoadEmployees(sourceFileLocation);
-            var idsToDelete = LoadIdsToDelete(recordsToDeleteFileLocation);
+            try
+            {
+                employees = LoadEmployees(sourceFileLocation);
+                idsToDelete = LoadIdsToDelete(recordsToDeleteFileLocation);
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine($"Oh no - this application hit an error looking for a required input file.\nThe error was {ex.Message}");
+                Console.WriteLine($"The operation has been terminated. Press any key to exit the program.");
+                Console.Read();
+
+                Environment.Exit(-1);
+            }
 
             // This is the line where we code the logic for our deletion.
             // TODO: If time allows, this is the line to optimize.
             var results = employees.Where(e => !idsToDelete.Contains(e.Id));
 
             // Save our new employee list, following our deletes
+            Console.WriteLine("The application is now creating a new list of employees." +
+                "\nPlease be patient as this operation may take some time.");
+
             SaveEmployeeList(outputFileLocation, results);
+
+            Console.WriteLine($"All done. You can now view your new employee list in the file '{outputFileLocation}'");
+            Console.WriteLine("Have a nice day. Press any key to exit");
+            Console.Read();
         }
 
         /// <summary>
